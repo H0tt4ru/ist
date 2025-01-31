@@ -28,38 +28,36 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthFilter;
-    private final AuthenticationProvider authenticationProvider;
+        private final JwtAuthenticationFilter jwtAuthFilter;
+        private final AuthenticationProvider authenticationProvider;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register").permitAll()
-                        .requestMatchers("/login").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/student/**").hasRole("USER")
-                        .anyRequest().authenticated())
-                .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+                httpSecurity
+                                .csrf(csrf -> csrf.disable())
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                .requestMatchers("/student/**").hasRole("USER")
+                                                .anyRequest().permitAll())
+                                .exceptionHandling(exceptionHandling -> exceptionHandling
+                                                .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authenticationProvider(authenticationProvider)
+                                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return httpSecurity.build();
-    }
-
-    public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
-
-        @Override
-        public void commence(HttpServletRequest request, HttpServletResponse response,
-                AuthenticationException authenticationException) throws IOException, ServletException {
-            response.setContentType("application/json");
-            response.setStatus(HttpStatus.OK.value());
-            response.getWriter().write(
-                    "{\"responseCode\": 4902, \"responseMessage\": \"Unauthorized request to external service\"}");
+                return httpSecurity.build();
         }
-    }
+
+        public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+                @Override
+                public void commence(HttpServletRequest request, HttpServletResponse response,
+                                AuthenticationException authenticationException) throws IOException, ServletException {
+                        response.setContentType("application/json");
+                        response.setStatus(HttpStatus.OK.value());
+                        response.getWriter().write(
+                                        "{\"responseCode\": 4902, \"responseMessage\": \"Unauthorized request to external service\"}");
+                }
+        }
 }

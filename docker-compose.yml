@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+  artemis:
+    image: apache/activemq-artemis
+    container_name: artemis
+    ports:
+      - "61616:61616" # Core protocol
+      - "8161:8161" # Web UI
+    environment:
+      ARTEMIS_USER: admin
+      ARTEMIS_PASSWORD: admin
+
+  service-authentication:
+    build: ./service-authentication
+    depends_on:
+      - artemis
+    environment:
+      SPRING_ARTEMIS_BROKER_URL: tcp://artemis:61616
+
+  service-user:
+    build: ./service-user
+    depends_on:
+      - artemis
+    environment:
+      SPRING_ARTEMIS_BROKER_URL: tcp://artemis:61616
+
+  service-wallet:
+    build: ./service-wallet
+    depends_on:
+      - artemis
+    environment:
+      SPRING_ARTEMIS_BROKER_URL: tcp://artemis:61616

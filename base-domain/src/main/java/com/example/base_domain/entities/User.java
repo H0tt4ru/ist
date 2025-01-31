@@ -28,8 +28,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "user")
 @Data
+@Table(name = "_user")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -40,7 +40,7 @@ public class User implements UserDetails {
     private UUID id;
 
     @Column(nullable = false)
-    private String user;
+    private String username;
 
     @Column(nullable = false, unique = true)
     @Email
@@ -63,6 +63,14 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.getRolePrefix()));
+    }
+
+    public String getUser() {
+        return username;
+    }
+
+    public void setUser(String user) {
+        this.username = user;
     }
 
     @Override

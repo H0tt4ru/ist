@@ -73,9 +73,7 @@ public class UserService {
         }
     }
 
-    @JmsListener(destination = "createUserDetail")
-    @Transactional
-    public void createUser(@Payload UserDetailDTO userDetailDTO) throws Exception {
+    public ResponseEntity<Object> createUser(UserDetailDTO userDetailDTO) throws Exception {
         try {
             UserDetail userDetail = UserDetail.builder()
                     .id(userDetailDTO.getId())
@@ -86,6 +84,7 @@ public class UserService {
                     .address(userDetailDTO.getAddress())
                     .build();
             userDetailRepository.save(userDetail);
+            return ResponseEntity.ok("2000");
         } catch (Exception e) {
             throw new Exception("4000");
         }

@@ -9,16 +9,23 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.base_domain.dtos.UserDetailDTO;
 import com.example.base_domain.entities.UserDetail;
 import com.example.service_user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
+
+    @PostMapping("/create")
+    public ResponseEntity<Object> createUser(@RequestBody UserDetailDTO userDetailDTO) throws Exception {
+        return userService.createUser(userDetailDTO);
+    }
 
     @GetMapping("/admin/users")
     public ResponseEntity<Object> getUsers() throws Exception {
