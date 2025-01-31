@@ -9,6 +9,6 @@ import com.example.base_domain.dtos.WalletDTO;
 
 @FeignClient(name = "wallet-service", url = "http://localhost:8082")
 public interface WalletClient {
-    @PostMapping("/wallet")
+    @PostMapping("/wallet/create")
     ResponseEntity<String> createWallet(@RequestBody WalletDTO walletDTO);
 }

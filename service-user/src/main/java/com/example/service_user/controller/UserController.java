@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.base_domain.dtos.UserDetailDTO;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/user-detail")
 public class UserController {
 
     private final UserService userService;
@@ -27,37 +29,37 @@ public class UserController {
         return userService.createUser(userDetailDTO);
     }
 
-    @GetMapping("/admin/users")
+    @GetMapping("/get-all")
     public ResponseEntity<Object> getUsers() throws Exception {
         return userService.getUsers();
     }
 
-    @GetMapping("/admin/user")
+    @GetMapping("/get")
     public ResponseEntity<Object> getUser(@RequestBody UUID id) throws Exception {
         return userService.getUser(id);
     }
 
-    // @PutMapping("/admin/user")
-    // public ResponseEntity<Object> updateUser(@RequestBody ) throws Exception {
-    // return userService.updateUser(user);
-    // }
+    @PutMapping("/admin/user")
+    public ResponseEntity<Object> updateUser(@RequestBody UserDetailDTO userDetailDTO) throws Exception {
+        return userService.updateUser(userDetailDTO);
+    }
 
-    @DeleteMapping("/admin/user")
+    @DeleteMapping("/delete")
     public ResponseEntity<Object> deleteUser(@RequestBody UUID id) throws Exception {
         return userService.deleteUser(id);
     }
 
-    @GetMapping("/user/profile")
+    @GetMapping("/profile")
     public ResponseEntity<Object> getProfile() throws Exception {
         return userService.getProfile();
     }
 
-    @PutMapping("/user/profile")
+    @PutMapping("/update-profile")
     public ResponseEntity<Object> updateProfile(@RequestBody UserDetail profile) throws Exception {
         return userService.updateProfile(profile);
     }
 
-    @DeleteMapping("/user/profile")
+    @DeleteMapping("/delete-profile")
     public ResponseEntity<Object> deleteProfile() throws Exception {
         return userService.deleteProfile();
     }

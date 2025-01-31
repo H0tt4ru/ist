@@ -10,6 +10,6 @@ import com.example.base_domain.dtos.UserDetailDTO;
 @FeignClient(name = "user-detail-service", url = "http://localhost:8081")
 public interface UserDetailClient {
 
-    @PostMapping("/user-detail")
+    @PostMapping("/user-detail/create")
     ResponseEntity<String> createUserDetail(@RequestBody UserDetailDTO userDetailDTO);
 }

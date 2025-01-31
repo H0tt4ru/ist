@@ -8,8 +8,6 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jms.annotation.JmsListener;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -21,7 +19,6 @@ import com.example.base_domain.repositories.UserDetailRepository;
 import com.example.base_domain.repositories.UserRepository;
 import com.example.service_user.response.UserResponse;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -90,11 +87,19 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<Object> updateUser(UserDetail user) throws Exception {
+    public ResponseEntity<Object> updateUser(UserDetailDTO userDetailDTO) throws Exception {
         try {
-            Optional<UserDetail> userDetail = userDetailRepository.findById(user.getId());
-            if (userDetail.isPresent()) {
-                userDetailRepository.save(user);
+            Optional<UserDetail> optionalUserDetail = userDetailRepository.findById(userDetailDTO.getId());
+            if (optionalUserDetail.isPresent()) {
+                UserDetail userDetail = UserDetail.builder()
+                        .id(userDetailDTO.getId())
+                        .fullName(userDetailDTO.getFullName())
+                        .gender(userDetailDTO.getGender())
+                        .dob(userDetailDTO.getDob())
+                        .phoneNumber(userDetailDTO.getPhoneNumber())
+                        .address(userDetailDTO.getAddress())
+                        .build();
+                userDetailRepository.save(userDetail);
                 return ResponseEntity.ok("2000");
             } else {
                 throw new Exception("4000");
