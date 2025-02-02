@@ -21,6 +21,7 @@ public class WalletService {
 
     public ResponseEntity<Object> createWallet(WalletDTO walletDTO) throws Exception {
         try {
+            System.out.println("test");
             Wallet wallet = Wallet.builder()
                     .id(walletDTO.getId())
                     .balance(walletDTO.getBalance())

@@ -2,6 +2,7 @@ package com.example.service_wallet.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,8 +18,8 @@ public class WalletController {
 
     private final WalletService walletService;
 
-    @PostMapping
-    public ResponseEntity<Object> createWallet(WalletDTO walletDTO) throws Exception {
+    @PostMapping("/create")
+    public ResponseEntity<Object> createWallet(@RequestBody WalletDTO walletDTO) throws Exception {
         return walletService.createWallet(walletDTO);
     }
 }
