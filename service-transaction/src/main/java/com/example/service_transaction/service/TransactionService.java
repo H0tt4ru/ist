@@ -45,9 +45,9 @@ public class TransactionService {
     public ResponseEntity<Object> getAllTransactions() {
         List<Transaction> transactions = transactionRepository.findAll();
         if (transactions.isEmpty()) {
-            return ResponseEntity.ok("No transactions found");
+            return ResponseEntity.ok("4000");
         }
-        List<TransactionDTO> transactionDTOs = transactions.stream().map(transaction -> TransactionDTO.builder()
+        List<Transaction> transactionDTOs = transactions.stream().map(transaction -> Transaction.builder()
                 .id(transaction.getId())
                 .senderId(transaction.getSenderId())
                 .receiverId(transaction.getReceiverId())
@@ -68,7 +68,7 @@ public class TransactionService {
                 .collect(Collectors.toList());
 
         if (filteredTransactions.isEmpty()) {
-            return ResponseEntity.ok("No transactions found");
+            return ResponseEntity.ok("4000");
         }
         return ResponseEntity.ok(filteredTransactions);
     }
@@ -89,19 +89,19 @@ public class TransactionService {
                 jmsTemplate.convertAndSend("transaction-queue", transactionDTO);
                 return ResponseEntity.ok(transactionRequest);
             } else {
-                return ResponseEntity.status(404).body("Receiver not found");
+                return ResponseEntity.status(404).body("4000");
             }
         } else {
-            return ResponseEntity.status(404).body("Sender not found");
+            return ResponseEntity.status(404).body("4000");
         }
     }
 
     public ResponseEntity<Object> deleteTransaction(UUID id) {
         if (transactionRepository.existsById(id)) {
             transactionRepository.deleteById(id);
-            return ResponseEntity.ok("Transaction deleted");
+            return ResponseEntity.ok("2000");
         } else {
-            return ResponseEntity.status(404).body("Transaction not found");
+            return ResponseEntity.status(404).body("4000");
         }
     }
 }

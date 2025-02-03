@@ -1,0 +1,112 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = 'service-authentication:latest'
+    }
+
+    stages {
+        stage('Checkout BOM') {
+            steps {
+                // Checkout the BOM repository (this should be in the parent repo)
+                dir('bom') {
+                    git 'https://github.com/yourusername/parent-repo.git'  // Use the correct URL for your parent repo
+                }
+            }
+        }
+
+        stage('Maven Build BOM') {
+            steps {
+                script {
+                    // Run mvn clean install on the BOM
+                    dir('bom') {
+                        sh 'mvn clean install'
+                    }
+                }
+            }
+        }
+
+        stage('Checkout and Build base-domain') {
+            steps {
+                dir('base-domain') {
+                    git 'https://github.com/yourusername/base-domain.git'  // Replace with actual repo URL
+                }
+            }
+        }
+
+        stage('Maven Build base-domain') {
+            steps {
+                script {
+                    dir('base-domain') {
+                        sh 'mvn clean install'
+                    }
+                }
+            }
+        }
+
+        parallel {
+            stage('Checkout and Build api-core') {
+                steps {
+                    dir('api-core') {
+                        git 'https://github.com/yourusername/api-core.git'  // Replace with actual repo URL
+                    }
+                }
+            }
+
+            stage('Checkout and Build shared-utils') {
+                steps {
+                    dir('shared-utils') {
+                        git 'https://github.com/yourusername/shared-utils.git'  // Replace with actual repo URL
+                    }
+                }
+            }
+
+            stage('Maven Build api-core') {
+                steps {
+                    script {
+                        dir('api-core') {
+                            sh 'mvn clean install'
+                        }
+                    }
+                }
+            }
+
+            stage('Maven Build shared-utils') {
+                steps {
+                    script {
+                        dir('shared-utils') {
+                            sh 'mvn clean install'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Checkout service-authentication') {
+            steps {
+                dir('service-authentication') {
+                    git 'https://github.com/yourusername/service-authentication.git'  // Replace with actual repo URL
+                }
+            }
+        }
+
+        stage('Maven Build service-authentication') {
+            steps {
+                script {
+                    dir('service-authentication') {
+                        sh 'mvn clean package'
+                    }
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                script {
+                    // Build Docker image using the provided Dockerfile
+                    sh 'docker build -t ${DOCKER_IMAGE} .'
+                }
+            }
+        }
+    }
+}

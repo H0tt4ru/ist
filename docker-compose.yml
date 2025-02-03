@@ -1,32 +1,71 @@
 version: "3.8"
+
 services:
-  artemis:
-    image: apache/activemq-artemis
-    container_name: artemis
-    ports:
-      - "61616:61616" # Core protocol
-      - "8161:8161" # Web UI
+  postgres:
+    image: postgres:16
+    container_name: PostgreSQL
     environment:
-      ARTEMIS_USER: admin
-      ARTEMIS_PASSWORD: admin
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: ist
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mynetwork
 
   service-authentication:
     build: ./service-authentication
+    container_name: service-authentication
     depends_on:
-      - artemis
+      - postgres
     environment:
-      SPRING_ARTEMIS_BROKER_URL: tcp://artemis:61616
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ist
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    networks:
+      - mynetwork
 
   service-user:
     build: ./service-user
+    container_name: service-user
     depends_on:
-      - artemis
+      - postgres
     environment:
-      SPRING_ARTEMIS_BROKER_URL: tcp://artemis:61616
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ist
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    networks:
+      - mynetwork
 
   service-wallet:
     build: ./service-wallet
+    container_name: service-wallet
     depends_on:
-      - artemis
+      - postgres
     environment:
-      SPRING_ARTEMIS_BROKER_URL: tcp://artemis:61616
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ist
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    networks:
+      - mynetwork
+
+  service-transaction:
+    build: ./service-transaction
+    container_name: service-transaction
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ist
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
+
+volumes:
+  postgres_data:
