@@ -38,7 +38,7 @@ public class UserController {
         return userService.getUser(id);
     }
 
-    @PutMapping("/admin/user")
+    @PutMapping("/update")
     public ResponseEntity<Object> updateUser(@RequestBody UserDetailDTO userDetailDTO) throws Exception {
         return userService.updateUser(userDetailDTO);
     }
