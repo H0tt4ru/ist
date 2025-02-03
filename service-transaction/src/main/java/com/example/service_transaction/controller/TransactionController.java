@@ -34,15 +34,15 @@ public class TransactionController {
         return transactionService.getTransaction(getRequest);
     }
 
-    @PostMapping("/transaction")
-    public ResponseEntity<Object> createTransaction(@RequestBody TransactionRequest transactionRequest)
-            throws Exception {
-        return transactionService.createTransaction(transactionRequest);
-    }
-
     @DeleteMapping("/delete")
     public ResponseEntity<Object> deleteTransaction(@RequestBody UUID uid)
             throws Exception {
         return transactionService.deleteTransaction(uid);
+    }
+
+    @PostMapping("/transaction")
+    public ResponseEntity<Object> createTransaction(@RequestBody TransactionRequest transactionRequest)
+            throws Exception {
+        return transactionService.createTransaction(transactionRequest);
     }
 }

@@ -34,8 +34,8 @@ public class UserController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<Object> getUser(@RequestBody UUID id) throws Exception {
-        return userService.getUser(id);
+    public ResponseEntity<Object> getUser(@RequestBody UUID uuid) throws Exception {
+        return userService.getUser(uuid);
     }
 
     @PutMapping("/update")
@@ -44,8 +44,8 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Object> deleteUser(@RequestBody UUID id) throws Exception {
-        return userService.deleteUser(id);
+    public ResponseEntity<Object> deleteUser(@RequestBody UUID uuid) throws Exception {
+        return userService.deleteUser(uuid);
     }
 
     @GetMapping("/profile")
@@ -61,5 +61,10 @@ public class UserController {
     @DeleteMapping("/delete-profile")
     public ResponseEntity<Object> deleteProfile() throws Exception {
         return userService.deleteProfile();
+    }
+
+    @GetMapping("/get-top")
+    public ResponseEntity<Object> getTopUsers(@RequestBody Integer top) throws Exception {
+        return userService.getTopUsers(top);
     }
 }

@@ -23,4 +23,6 @@ public class UserResponse extends BaseResponse {
     private String dob;
     private String phoneNumber;
     private String address;
+
+    private Integer balance;
 }
