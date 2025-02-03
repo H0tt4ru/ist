@@ -26,10 +26,10 @@ RUN mvn clean install -DskipTests && rm -rf /app/api-core
 
 WORKDIR /app
 
-COPY service-user/.mvn .mvn
-COPY service-user/mvnw mvnw
-COPY service-user/pom.xml pom.xml
-COPY service-user/src /app/src
+COPY service-transaction/.mvn .mvn
+COPY service-transaction/mvnw mvnw
+COPY service-transaction/pom.xml pom.xml
+COPY service-transaction/src /app/src
 
 RUN mvn clean package -DskipTests
 

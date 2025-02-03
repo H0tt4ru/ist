@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.base_domain.dtos.UserDetailDTO;
-import com.example.base_domain.entities.UserDetail;
 import com.example.service_user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -55,8 +54,8 @@ public class UserController {
     }
 
     @PutMapping("/update-profile")
-    public ResponseEntity<Object> updateProfile(@RequestBody UserDetail profile) throws Exception {
-        return userService.updateProfile(profile);
+    public ResponseEntity<Object> updateProfile(@RequestBody UserDetailDTO userDetailDTO) throws Exception {
+        return userService.updateProfile(userDetailDTO);
     }
 
     @DeleteMapping("/delete-profile")

@@ -28,6 +28,23 @@ public class UserService {
     private final UserDetailRepository userDetailRepository;
     private final UserRepository userRepository;
 
+    public ResponseEntity<Object> createUser(UserDetailDTO userDetailDTO) throws Exception {
+        try {
+            UserDetail userDetail = UserDetail.builder()
+                    .id(userDetailDTO.getId())
+                    .fullName(userDetailDTO.getFullName())
+                    .gender(userDetailDTO.getGender())
+                    .dob(userDetailDTO.getDob())
+                    .phoneNumber(userDetailDTO.getPhoneNumber())
+                    .address(userDetailDTO.getAddress())
+                    .build();
+            userDetailRepository.save(userDetail);
+            return ResponseEntity.ok("2000");
+        } catch (Exception e) {
+            throw new Exception("4000");
+        }
+    }
+
     public ResponseEntity<Object> getUsers() throws Exception {
         try {
             List<UserDetail> userDetail = userDetailRepository.findAll(Sort.by(Sort.Direction.ASC, "fullName"));
@@ -65,23 +82,6 @@ public class UserService {
             } else {
                 throw new Exception("4000");
             }
-        } catch (Exception e) {
-            throw new Exception("4000");
-        }
-    }
-
-    public ResponseEntity<Object> createUser(UserDetailDTO userDetailDTO) throws Exception {
-        try {
-            UserDetail userDetail = UserDetail.builder()
-                    .id(userDetailDTO.getId())
-                    .fullName(userDetailDTO.getFullName())
-                    .gender(userDetailDTO.getGender())
-                    .dob(userDetailDTO.getDob())
-                    .phoneNumber(userDetailDTO.getPhoneNumber())
-                    .address(userDetailDTO.getAddress())
-                    .build();
-            userDetailRepository.save(userDetail);
-            return ResponseEntity.ok("2000");
         } catch (Exception e) {
             throw new Exception("4000");
         }
@@ -131,14 +131,7 @@ public class UserService {
             if (user.isPresent()) {
                 Optional<UserDetail> userDetail = userDetailRepository.findById(user.get().getId());
                 if (userDetail.isPresent()) {
-                    return new ResponseEntity<>(UserResponse.builder()
-                            .username(user.get().getUsername())
-                            .email(user.get().getEmail())
-                            .fullName(userDetail.get().getFullName())
-                            .gender(userDetail.get().getGender())
-                            .phoneNumber(userDetail.get().getPhoneNumber())
-                            .address(userDetail.get().getAddress())
-                            .build(), HttpStatus.OK);
+                    return getUser(user.get().getId());
                 } else {
                     throw new Exception("4000");
                 }
@@ -150,23 +143,21 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<Object> updateProfile(UserDetail user) throws Exception {
+    public ResponseEntity<Object> updateProfile(UserDetailDTO userDetailDTO) throws Exception {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
-            Optional<User> userEntity = userRepository.findByEmail(email);
-            if (userEntity.isPresent()) {
-                Optional<UserDetail> userDetail = userDetailRepository.findById(userEntity.get().getId());
-                if (userDetail.isPresent()) {
-                    userDetailRepository.save(user);
-                    return ResponseEntity.ok("2000");
-                } else {
-                    throw new Exception("4000");
-                }
+            Optional<UserDetail> userDetail = userDetailRepository
+                    .findById(userRepository.findByEmail(email).get().getId());
+            if (userDetail.isPresent()) {
+                updateUser(userDetailDTO);
+                return ResponseEntity.ok("2000");
             } else {
                 throw new Exception("4000");
             }
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             throw new Exception("4000");
         }
     }
@@ -179,8 +170,7 @@ public class UserService {
             if (user.isPresent()) {
                 Optional<UserDetail> userDetail = userDetailRepository.findById(user.get().getId());
                 if (userDetail.isPresent()) {
-                    userDetailRepository.deleteById(user.get().getId());
-                    return ResponseEntity.ok("2000");
+                    return deleteUser(user.get().getId());
                 } else {
                     throw new Exception("4000");
                 }
