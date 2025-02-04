@@ -1,4 +1,4 @@
-package com.example.service_transaction.request;
+package com.example.service_user.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GetRequest {
+public class UserGetRequest {
 
-    private String senderEmail;
-    private String receiverEmail;
+    private String email;
 }

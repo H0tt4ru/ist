@@ -1,7 +1,8 @@
 package com.example.service_user.service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Sort;
@@ -18,6 +19,10 @@ import com.example.base_domain.entities.Wallet;
 import com.example.base_domain.repositories.UserDetailRepository;
 import com.example.base_domain.repositories.UserRepository;
 import com.example.base_domain.repositories.WalletRepository;
+import com.example.service_user.request.TopRequest;
+import com.example.service_user.request.UserGetRequest;
+import com.example.service_user.request.UserRequest;
+import com.example.service_user.response.ListUserResponse;
 import com.example.service_user.response.UserResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -36,6 +41,9 @@ public class UserService {
             userDetailRepository.save(userDetail);
             return ResponseEntity.ok("2000");
         } catch (Exception e) {
+            if (userDetailRepository.existsById(userDetailDTO.getId())) {
+                userDetailRepository.deleteById(userDetailDTO.getId());
+            }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("4000");
         }
     }
@@ -53,7 +61,12 @@ public class UserService {
                             }
                         })
                         .collect(Collectors.toList());
-                return ResponseEntity.ok(userResponses);
+                ListUserResponse listUserResponse = ListUserResponse.builder()
+                        .code("2000")
+                        .message("Success")
+                        .users(userResponses)
+                        .build();
+                return ResponseEntity.ok(listUserResponse);
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("4000");
             }
@@ -62,9 +75,10 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<Object> getUser(UUID uuid) throws Exception {
+    public ResponseEntity<Object> getUser(UserGetRequest userRequest) throws Exception {
         try {
-            UserDetail userDetail = userDetailRepository.findById(uuid)
+            UserDetail userDetail = userDetailRepository
+                    .findById(userRepository.findByEmail(userRequest.getEmail()).get().getId())
                     .orElseThrow(() -> new Exception("4000"));
             UserResponse userResponse = buildUserResponse(userDetail);
             return ResponseEntity.ok(userResponse);
@@ -73,23 +87,36 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<Object> updateUser(UserDetailDTO userDetailDTO) throws Exception {
+    public ResponseEntity<Object> updateUser(UserRequest userRequest) throws Exception {
         try {
-            UserDetail userDetail = userDetailRepository.findById(userDetailDTO.getId())
+            User user = userRepository.findById(userRequest.getId())
                     .orElseThrow(() -> new Exception("User not found"));
-            updateUserDetail(userDetail, userDetailDTO);
+            userDetailRepository.findById(userRequest.getId())
+                    .orElseThrow(() -> new Exception("User not found"));
+            UserDetail userDetail = buildUserDetail(UserDetailDTO.builder()
+                    .id(userRequest.getId())
+                    .fullName(userRequest.getFullName())
+                    .gender(userRequest.getGender())
+                    .dob(LocalDate.parse(userRequest.getDob()).atStartOfDay(ZoneId.of("UTC")).toInstant())
+                    .phoneNumber(userRequest.getPhoneNumber())
+                    .address(userRequest.getAddress())
+                    .build());
+            user.setUsername(userRequest.getUsername());
             userDetailRepository.save(userDetail);
-            return ResponseEntity.ok("2000");
+            userRepository.save(user);
+            UserResponse userResponse = buildUserResponse(userDetail);
+            return ResponseEntity.ok(userResponse);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("4000");
         }
     }
 
-    public ResponseEntity<Object> deleteUser(UUID uuid) throws Exception {
+    public ResponseEntity<Object> deleteUser(UserGetRequest userGetRequest) throws Exception {
         try {
-            UserDetail userDetail = userDetailRepository.findById(uuid)
+            UserDetail userDetail = userDetailRepository
+                    .findById(userRepository.findByEmail(userGetRequest.getEmail()).get().getId())
                     .orElseThrow(() -> new Exception("User not found"));
-            userDetailRepository.delete(userDetail);
+            userDetailRepository.deleteById(userDetail.getId());
             return ResponseEntity.ok("2000");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("4000");
@@ -102,20 +129,23 @@ public class UserService {
             String email = authentication.getName();
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new Exception("4000"));
-            return getUser(user.getId());
+            UserGetRequest userRequest = new UserGetRequest();
+            userRequest.setEmail(user.getEmail());
+            return getUser(userRequest);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("4000");
         }
     }
 
-    public ResponseEntity<Object> updateProfile(UserDetailDTO userDetailDTO) throws Exception {
+    public ResponseEntity<Object> updateProfile(UserRequest userRequest) throws Exception {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new Exception("4000"));
-            userDetailDTO.setId(user.getId());
-            return updateUser(userDetailDTO);
+            userRequest.setId(user.getId());
+            return updateUser(userRequest);
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("4000");
         }
@@ -127,18 +157,21 @@ public class UserService {
             String email = authentication.getName();
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new Exception("4000"));
-            return deleteUser(user.getId());
+            UserGetRequest userRequest = UserGetRequest.builder()
+                    .email(user.getEmail())
+                    .build();
+            return deleteUser(userRequest);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("4000");
         }
     }
 
-    public ResponseEntity<Object> getTopUsers(Integer top) throws Exception {
+    public ResponseEntity<Object> getTopUsers(TopRequest topRequest) throws Exception {
         try {
             List<Wallet> wallets = walletRepository.findAll(Sort.by(Sort.Direction.DESC, "balance"));
             if (!wallets.isEmpty()) {
                 List<UserResponse> userResponses = wallets.stream()
-                        .limit(top)
+                        .limit(topRequest.getTop())
                         .map(wallet -> {
                             try {
                                 UserDetail userDetail = userDetailRepository.findById(wallet.getId()).orElseThrow();
@@ -148,7 +181,12 @@ public class UserService {
                             }
                         })
                         .collect(Collectors.toList());
-                return ResponseEntity.ok(userResponses);
+                ListUserResponse listUserResponse = ListUserResponse.builder()
+                        .code("2000")
+                        .message("Success")
+                        .users(userResponses)
+                        .build();
+                return ResponseEntity.ok(listUserResponse);
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("4000");
             }
@@ -166,14 +204,6 @@ public class UserService {
                 .phoneNumber(userDetailDTO.getPhoneNumber())
                 .address(userDetailDTO.getAddress())
                 .build();
-    }
-
-    private void updateUserDetail(UserDetail userDetail, UserDetailDTO userDetailDTO) throws Exception {
-        userDetail.setFullName(userDetailDTO.getFullName());
-        userDetail.setGender(userDetailDTO.getGender());
-        userDetail.setDob(userDetailDTO.getDob());
-        userDetail.setPhoneNumber(userDetailDTO.getPhoneNumber());
-        userDetail.setAddress(userDetailDTO.getAddress());
     }
 
     private UserResponse buildUserResponse(UserDetail userDetail) throws Exception {

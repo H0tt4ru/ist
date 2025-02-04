@@ -24,7 +24,9 @@ import com.example.service_authentication.request.LoginRequest;
 import com.example.service_authentication.request.RegisterRequest;
 import com.example.service_authentication.response.LoginResponse;
 import com.example.service_authentication.response.RegisterResponse;
+import com.example.base_domain.repositories.UserDetailRepository;
 import com.example.base_domain.repositories.UserRepository;
+import com.example.base_domain.repositories.WalletRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +37,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthenticationService {
 
     private final UserRepository userRepository;
+    private final UserDetailRepository userDetailRepository;
+    private final WalletRepository walletRepository;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -74,6 +78,8 @@ public class AuthenticationService {
                     .phoneNumber(registerRequest.getPhoneNumber())
                     .address(registerRequest.getAddress()).build();
 
+            System.out.println(userDetailDTO.getDob());
+
             ResponseEntity<String> userDetailResponse = userDetailClient.createUserDetail(userDetailDTO);
             if (!userDetailResponse.getStatusCode().is2xxSuccessful()) {
                 throw new Exception("4000");
@@ -97,6 +103,12 @@ public class AuthenticationService {
 
             return new ResponseEntity<>(registerResponse, HttpStatus.OK);
         } catch (Exception e) {
+            if (userDetailRepository.existsById(userRepository.findByEmail(registerRequest.getEmail()).get().getId())) {
+                userDetailRepository.deleteById(userRepository.findByEmail(registerRequest.getEmail()).get().getId());
+            }
+            if (walletRepository.existsById(userRepository.findByEmail(registerRequest.getEmail()).get().getId())) {
+                walletRepository.deleteById(userRepository.findByEmail(registerRequest.getEmail()).get().getId());
+            }
             log.error("Registration failed", e);
             throw new RuntimeException(e.getMessage());
         }

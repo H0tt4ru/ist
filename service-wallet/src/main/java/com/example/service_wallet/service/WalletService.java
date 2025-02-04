@@ -30,12 +30,11 @@ public class WalletService {
                     .balance(walletDTO.getBalance())
                     .build();
             walletRepository.save(wallet);
-            WalletResponse walletResponse = WalletResponse.builder()
-                    .email(userRepository.findById(walletDTO.getId()).get().getEmail())
-                    .balance(wallet.getBalance())
-                    .build();
-            return ResponseEntity.ok(walletResponse);
+            return ResponseEntity.ok("2000");
         } catch (Exception e) {
+            if (walletRepository.existsById(walletDTO.getId())) {
+                walletRepository.deleteById(walletDTO.getId());
+            }
             throw new Exception("4000");
         }
     }

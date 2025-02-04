@@ -23,11 +23,6 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
-    @GetMapping("/get-all")
-    public ResponseEntity<Object> getAllTransactions() throws Exception {
-        return transactionService.getAllTransactions();
-    }
-
     @GetMapping("/get")
     public ResponseEntity<Object> getTransaction(@RequestBody GetRequest getRequest)
             throws Exception {

@@ -1,4 +1,6 @@
-package com.example.service_user.response;
+package com.example.service_user.request;
+
+import java.util.UUID;
 
 import com.example.base_domain.constant.Gender;
 
@@ -11,15 +13,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserResponse {
-    private String username;
-    private String email;
+public class UserRequest {
 
+    private UUID id;
+    private String username;
     private String fullName;
     private Gender gender;
     private String dob;
     private String phoneNumber;
     private String address;
-
-    private Integer balance;
 }

@@ -17,6 +17,7 @@
 	<description>Service Wallet</description>
 	
 	<properties>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<java.version>23</java.version>
 	</properties>
 
