@@ -2,70 +2,112 @@ version: "3.8"
 
 services:
   postgres:
-    image: postgres:16
-    container_name: PostgreSQL
+    image: postgres:latest
+    container_name: postgres-db
+    restart: always
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
       POSTGRES_DB: ist
     ports:
       - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     networks:
-      - mynetwork
+      - test-networks
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d ist"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  artemis:
+    image: apache/activemq-artemis:latest
+    container_name: artemis
+    restart: always
+    environment:
+      ARTEMIS_USERNAME: admin
+      ARTEMIS_PASSWORD: admin
+      ENABLE_JMX_EXPORTER: "false"
+      DISABLE_SECURITY: "true"
+    ports:
+      - "8161:8161"
+      - "61616:61616"
+    networks:
+      - test-networks
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8161"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   service-authentication:
-    build: ./service-authentication
+    image: service-authentication:latest
     container_name: service-authentication
+    restart: always
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ist
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/ist
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+    ports:
+      - "8080:8080"
     networks:
-      - mynetwork
+      - test-networks
 
   service-user:
-    build: ./service-user
+    image: service-user:latest
     container_name: service-user
+    restart: always
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ist
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/ist
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+    ports:
+      - "8081:8081"
     networks:
-      - mynetwork
+      - test-networks
 
   service-wallet:
-    build: ./service-wallet
+    image: service-wallet:latest
     container_name: service-wallet
+    restart: always
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ist
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/ist
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+    ports:
+      - "8082:8082"
     networks:
-      - mynetwork
+      - test-networks
 
   service-transaction:
-    build: ./service-transaction
+    image: service-transaction:latest
     container_name: service-transaction
+    restart: always
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      artemis:
+        condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ist
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/ist
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+      SPRING_ARTEMIS_BROKER-URL: tcp://artemis:61616
+      SPRING_ARTEMIS_USERNAME: artemis
+      SPRING_ARTEMIS_PASSWORD: admin
+    ports:
+      - "8083:8083"
     networks:
-      - mynetwork
+      - test-networks
 
 networks:
-  mynetwork:
+  test-networks:
     driver: bridge
-
-volumes:
-  postgres_data:

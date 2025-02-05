@@ -27,6 +27,6 @@ COPY service-authentication/mvnw mvnw
 COPY service-authentication/pom.xml pom.xml
 COPY service-authentication/src /app/src
 
-RUN mvn clean package -DskipTests
+RUN mvn clean package install -DskipTests
 
 CMD ["mvn", "spring-boot:run"]

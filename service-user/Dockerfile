@@ -1,17 +1,13 @@
-# 🔥 Stage 1: Build Dependencies (BOM, base-domain, shared-utils, api-core)
 FROM eclipse-temurin:23-jdk-alpine
 
 RUN apk add --no-cache maven
 
-# Persist Maven repository
 ENV MAVEN_OPTS="-Dmaven.repo.local=/root/.m2/repository"
 
-# Copy the parent BOM and install
 COPY pom.xml /app/bom/pom.xml
 WORKDIR /app/bom
 RUN mvn clean install -DskipTests && rm -rf /app/bom
 
-# Copy and install other dependencies
 COPY base-domain /app/base-domain
 WORKDIR /app/base-domain
 RUN mvn clean install -DskipTests && rm -rf /app/base-domain
@@ -31,6 +27,6 @@ COPY service-user/mvnw mvnw
 COPY service-user/pom.xml pom.xml
 COPY service-user/src /app/src
 
-RUN mvn clean package -DskipTests
+RUN mvn clean package install -DskipTests
 
 CMD ["mvn", "spring-boot:run"]
