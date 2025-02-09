@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TransactionDTO implements Serializable {
 
+    private UUID id;
     private UUID senderId;
     private UUID receiverId;
     private Integer amount;

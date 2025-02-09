@@ -5,10 +5,10 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.example.base_domain.entities.ErrorCode;
+import com.example.base_domain.entities.Code;
 
 @Repository
-public interface ErrorCodeRepository extends JpaRepository<ErrorCode, String> {
+public interface CodeRepository extends JpaRepository<Code, String> {
 
-    Optional<ErrorCode> findByCode(String code);
+    Optional<Code> findByCode(String code);
 }

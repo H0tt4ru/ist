@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TopRequest {
+public class GetUserRequest {
 
-    private Integer top;
+    private String email;
 }

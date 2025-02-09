@@ -19,9 +19,8 @@ import com.example.base_domain.entities.Wallet;
 import com.example.base_domain.repositories.UserDetailRepository;
 import com.example.base_domain.repositories.UserRepository;
 import com.example.base_domain.repositories.WalletRepository;
-import com.example.service_user.request.TopRequest;
-import com.example.service_user.request.UserGetRequest;
-import com.example.service_user.request.UserRequest;
+import com.example.service_user.request.GetTopRequest;
+import com.example.service_user.request.GetUserRequest;
 import com.example.service_user.response.ListUserResponse;
 import com.example.service_user.response.UserResponse;
 
@@ -37,7 +36,14 @@ public class UserService {
 
     public ResponseEntity<Object> createUser(UserDetailDTO userDetailDTO) throws Exception {
         try {
-            UserDetail userDetail = buildUserDetail(userDetailDTO);
+            UserDetail userDetail = UserDetail.builder()
+                    .id(userDetailDTO.getId())
+                    .fullName(userDetailDTO.getFullName())
+                    .gender(userDetailDTO.getGender())
+                    .dob(LocalDate.parse(userDetailDTO.getDob()).atStartOfDay(ZoneId.of("UTC")).toInstant())
+                    .phoneNumber(userDetailDTO.getPhoneNumber())
+                    .address(userDetailDTO.getAddress())
+                    .build();
             userDetailRepository.save(userDetail);
             return ResponseEntity.ok("2000");
         } catch (Exception e) {
@@ -50,7 +56,7 @@ public class UserService {
 
     public ResponseEntity<Object> getUsers() throws Exception {
         try {
-            List<UserDetail> userDetails = userDetailRepository.findAll(Sort.by(Sort.Direction.ASC, "fullName"));
+            List<UserDetail> userDetails = userDetailRepository.findAll(Sort.by(Sort.Direction.DESC, "fullName"));
             if (!userDetails.isEmpty()) {
                 List<UserResponse> userResponses = userDetails.stream()
                         .map(userDetail -> {
@@ -75,7 +81,7 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<Object> getUser(UserGetRequest userRequest) throws Exception {
+    public ResponseEntity<Object> getUser(GetUserRequest userRequest) throws Exception {
         try {
             UserDetail userDetail = userDetailRepository
                     .findById(userRepository.findByEmail(userRequest.getEmail()).get().getId())
@@ -87,23 +93,21 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<Object> updateUser(UserRequest userRequest) throws Exception {
+    public ResponseEntity<Object> updateUser(UserDetailDTO userDetailDTO) throws Exception {
         try {
-            User user = userRepository.findById(userRequest.getId())
+            userRepository.findById(userDetailDTO.getId())
                     .orElseThrow(() -> new Exception("User not found"));
-            userDetailRepository.findById(userRequest.getId())
+            userDetailRepository.findById(userDetailDTO.getId())
                     .orElseThrow(() -> new Exception("User not found"));
-            UserDetail userDetail = buildUserDetail(UserDetailDTO.builder()
-                    .id(userRequest.getId())
-                    .fullName(userRequest.getFullName())
-                    .gender(userRequest.getGender())
-                    .dob(LocalDate.parse(userRequest.getDob()).atStartOfDay(ZoneId.of("UTC")).toInstant())
-                    .phoneNumber(userRequest.getPhoneNumber())
-                    .address(userRequest.getAddress())
-                    .build());
-            user.setUsername(userRequest.getUsername());
+            UserDetail userDetail = UserDetail.builder()
+                    .id(userDetailDTO.getId())
+                    .fullName(userDetailDTO.getFullName())
+                    .gender(userDetailDTO.getGender())
+                    .dob(LocalDate.parse(userDetailDTO.getDob()).atStartOfDay(ZoneId.of("UTC")).toInstant())
+                    .phoneNumber(userDetailDTO.getPhoneNumber())
+                    .address(userDetailDTO.getAddress())
+                    .build();
             userDetailRepository.save(userDetail);
-            userRepository.save(user);
             UserResponse userResponse = buildUserResponse(userDetail);
             return ResponseEntity.ok(userResponse);
         } catch (Exception e) {
@@ -111,7 +115,7 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<Object> deleteUser(UserGetRequest userGetRequest) throws Exception {
+    public ResponseEntity<Object> deleteUser(GetUserRequest userGetRequest) throws Exception {
         try {
             UserDetail userDetail = userDetailRepository
                     .findById(userRepository.findByEmail(userGetRequest.getEmail()).get().getId())
@@ -129,7 +133,7 @@ public class UserService {
             String email = authentication.getName();
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new Exception("4000"));
-            UserGetRequest userRequest = new UserGetRequest();
+            GetUserRequest userRequest = new GetUserRequest();
             userRequest.setEmail(user.getEmail());
             return getUser(userRequest);
         } catch (Exception e) {
@@ -137,14 +141,12 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<Object> updateProfile(UserRequest userRequest) throws Exception {
+    public ResponseEntity<Object> updateProfile(UserDetailDTO userDetailDTO) throws Exception {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new Exception("4000"));
-            userRequest.setId(user.getId());
-            return updateUser(userRequest);
+            userDetailDTO.setId(userRepository.findByEmail(email).get().getId());
+            return updateUser(userDetailDTO);
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("4000");
@@ -157,7 +159,7 @@ public class UserService {
             String email = authentication.getName();
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new Exception("4000"));
-            UserGetRequest userRequest = UserGetRequest.builder()
+            GetUserRequest userRequest = GetUserRequest.builder()
                     .email(user.getEmail())
                     .build();
             return deleteUser(userRequest);
@@ -166,7 +168,7 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<Object> getTopUsers(TopRequest topRequest) throws Exception {
+    public ResponseEntity<Object> getTopUsers(GetTopRequest topRequest) throws Exception {
         try {
             List<Wallet> wallets = walletRepository.findAll(Sort.by(Sort.Direction.DESC, "balance"));
             if (!wallets.isEmpty()) {
@@ -195,21 +197,10 @@ public class UserService {
         }
     }
 
-    private UserDetail buildUserDetail(UserDetailDTO userDetailDTO) throws Exception {
-        return UserDetail.builder()
-                .id(userDetailDTO.getId())
-                .fullName(userDetailDTO.getFullName())
-                .gender(userDetailDTO.getGender())
-                .dob(userDetailDTO.getDob())
-                .phoneNumber(userDetailDTO.getPhoneNumber())
-                .address(userDetailDTO.getAddress())
-                .build();
-    }
-
     private UserResponse buildUserResponse(UserDetail userDetail) throws Exception {
         User user = userRepository.findById(userDetail.getId()).orElseThrow();
         return UserResponse.builder()
-                .username(user.getUsername())
+                .username(user.getUser())
                 .email(user.getEmail())
                 .fullName(userDetail.getFullName())
                 .gender(userDetail.getGender())

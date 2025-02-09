@@ -1,7 +1,5 @@
 package com.example.service_user.request;
 
-import java.util.UUID;
-
 import com.example.base_domain.constant.Gender;
 
 import lombok.AllArgsConstructor;
@@ -13,9 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserRequest {
+public class UpdateUserRequest {
 
-    private UUID id;
     private String username;
     private String fullName;
     private Gender gender;

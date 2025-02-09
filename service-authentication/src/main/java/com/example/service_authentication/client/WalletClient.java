@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.example.base_domain.dtos.WalletDTO;
 
-@FeignClient(name = "wallet-service", url = "http://localhost:8082")
+@FeignClient(name = "wallet-service", url = "${feign.url.wallet-service}")
 public interface WalletClient {
+
     @PostMapping("/wallet/create")
     ResponseEntity<String> createWallet(@RequestBody WalletDTO walletDTO);
 }

@@ -11,12 +11,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.example.base_domain.constant.Gender;
 import com.example.base_domain.constant.Role;
-import com.example.base_domain.entities.ErrorCode;
+import com.example.base_domain.entities.Code;
 import com.example.base_domain.entities.Transaction;
 import com.example.base_domain.entities.User;
 import com.example.base_domain.entities.UserDetail;
 import com.example.base_domain.entities.Wallet;
-import com.example.base_domain.repositories.ErrorCodeRepository;
+import com.example.base_domain.repositories.CodeRepository;
 import com.example.base_domain.repositories.TransactionRepository;
 import com.example.base_domain.repositories.UserDetailRepository;
 import com.example.base_domain.repositories.UserRepository;
@@ -28,102 +28,158 @@ public class SeederConfig {
         @Bean
         CommandLineRunner commandLineRunner(UserRepository userRepository,
                         UserDetailRepository userDetailRepository,
-                        TransactionRepository transactionRepository, ErrorCodeRepository errorCodeRepository,
+                        TransactionRepository transactionRepository, CodeRepository codeRepository,
                         WalletRepository walletRepository,
                         PasswordEncoder passwordEncoder) {
                 return _ -> {
-                        if (errorCodeRepository.count() == 0) {
-                                errorCodeRepository.saveAll(List.of(
-                                                ErrorCode.builder().code("4101").message("Broken request fields")
+                        if (codeRepository.count() == 0) {
+                                codeRepository.saveAll(List.of(
+                                                // ✅ Success Codes (2000 - 2999)
+                                                Code.builder().code("2000").message("Request completed successfully.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4102").message("Empty fields").build(),
-                                                ErrorCode.builder().code("4103").message("Email already exists")
+                                                Code.builder().code("2101").message("User registration successful.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4104").message(
-                                                                "Password must have at least 8 characters, 1 uppercase, 1 lowercase, and 1 number")
+                                                Code.builder().code("2102").message("User login successful.").build(),
+                                                Code.builder().code("2201").message("User detail created successfully.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4105")
-                                                                .message("Full name be no more than 100 characters")
+                                                Code.builder().code("2202").message("Users retrieved successfully.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4106")
-                                                                .message("Gender must be either Male or Female")
+                                                Code.builder().code("2203").message("User retrieved successfully.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4107").message("Invalid date of birth format")
+                                                Code.builder().code("2204").message("User updated successfully.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4108")
-                                                                .message("Major must be one of the provided majors")
+                                                Code.builder().code("2205").message("User deleted successfully.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4109")
-                                                                .message("Phone number must be numbers only and minimum 7 digits")
+                                                Code.builder().code("2206")
+                                                                .message("User profile retrieved successfully.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4110")
-                                                                .message("Username must be no more than 20 characters")
+                                                Code.builder().code("2207")
+                                                                .message("User profile updated successfully.").build(),
+                                                Code.builder().code("2208")
+                                                                .message("User profile deleted successfully.").build(),
+                                                Code.builder().code("2301").message("Wallet created successfully.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4200").message("Empty fields").build(),
-                                                ErrorCode.builder().code("4201").message("Wrong email or password")
+                                                Code.builder().code("2302").message("Wallet updated successfully.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4300").message("Empty database").build(),
-                                                ErrorCode.builder().code("4301").message("Student not found").build(),
-                                                ErrorCode.builder().code("4302")
-                                                                .message("Gender must be either Male or Female")
+                                                Code.builder().code("2303").message("Wallet deleted successfully.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4303").message("Invalid date of birth format")
+                                                Code.builder().code("2401").message("Transaction created successfully.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4304").message("Invalid major").build(),
-                                                ErrorCode.builder().code("4400").message("Empty fields").build(),
-                                                ErrorCode.builder().code("4401")
-                                                                .message("Destination student not found").build(),
-                                                ErrorCode.builder().code("4402")
-                                                                .message("Amount does not follow the rule").build(),
-                                                ErrorCode.builder().code("4403").message("Not enough points").build(),
-                                                ErrorCode.builder().code("4500")
-                                                                .message("Invalid type (must be one of: SentBy, ReceivedBy, All, or SentByReceivedBy)")
+                                                Code.builder().code("2402")
+                                                                .message("Transaction retrieved successfully.").build(),
+                                                Code.builder().code("2403").message("Transaction deleted successfully.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4501").message("SentBy student not found")
+                                                Code.builder().code("2404")
+                                                                .message("Transaction processed successfully.").build(),
+
+                                                // ❌ General Error Codes (4000 - 4099)
+                                                Code.builder().code("4000").message("General error occurred.").build(),
+                                                Code.builder().code("4010").message(
+                                                                "Unauthorized")
                                                                 .build(),
-                                                ErrorCode.builder().code("4502").message("ReceivedBy student not found")
+                                                Code.builder().code("4020")
+                                                                .message("Bad request").build(),
+                                                Code.builder().code("4030")
+                                                                .message("Too many requests: Rate limit exceeded.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4600").message("JWT token is missing")
+                                                Code.builder().code("4031").message(
+                                                                "Request timeout: Server took too long to respond.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4601").message("Invalid JWT token").build(),
-                                                ErrorCode.builder().code("4602").message("Expired JWT token").build(),
-                                                ErrorCode.builder().code("4603").message("Insufficient permissions")
+                                                Code.builder().code("4032")
+                                                                .message("Bad request: Duplicate request detected.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4604").message("Account locked").build(),
-                                                ErrorCode.builder().code("4700").message("Invalid email format")
+                                                Code.builder().code("4040").message(
+                                                                "Service unavailable: The requested service is down.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4701").message("Invalid password format")
+                                                Code.builder().code("4041").message(
+                                                                "Gateway timeout: Service did not respond in time.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4702").message("Invalid phone number format")
+                                                Code.builder().code("4042").message(
+                                                                "Bad gateway: Invalid response from upstream service.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4703").message("Invalid date of birth format")
+                                                Code.builder().code("4050").message(
+                                                                "Database error: Unable to process the request.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4800").message("Duplicate key violation")
+                                                Code.builder().code("4051")
+                                                                .message("Resource conflict: Data already exists.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4801").message("Foreign key violation")
+                                                Code.builder().code("4052").message(
+                                                                "Resource not found: The requested item does not exist.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4802").message("Transaction failed").build(),
-                                                ErrorCode.builder().code("4900").message("External API timeout")
+                                                Code.builder().code("4053").message(
+                                                                "Precondition failed: Required conditions not met.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4901")
-                                                                .message("Invalid response from external service")
+                                                Code.builder().code("4090").message(
+                                                                "Internal server error: An unexpected error occurred.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4902")
-                                                                .message("Unauthorized request to external service")
+                                                Code.builder().code("4091")
+                                                                .message("Service error: Dependency service failure.")
                                                                 .build(),
-                                                ErrorCode.builder().code("4903").message("Inconsistent state").build(),
-                                                ErrorCode.builder().code("4904").message("Missing required field")
+                                                Code.builder().code("4092").message(
+                                                                "Configuration error: Misconfigured environment settings.")
                                                                 .build(),
-                                                ErrorCode.builder().code("5100")
-                                                                .message("Rate limit exceeded – Too many requests")
+
+                                                // ❌ Service-Authentication Errors (4100 - 4199)
+                                                Code.builder().code("4100")
+                                                                .message("User registration failed: email already exists.")
                                                                 .build(),
-                                                ErrorCode.builder().code("5101").message("API rate limit exceeded")
+                                                Code.builder().code("4101")
+                                                                .message("User registration failed: Empty field.")
                                                                 .build(),
-                                                ErrorCode.builder().code("5200").message("Feature not yet implemented")
+                                                Code.builder().code("4102")
+                                                                .message("User registration failed: Invalid username.")
                                                                 .build(),
-                                                ErrorCode.builder().code("5201").message("Unknown error occurred")
+                                                Code.builder().code("4103").message(
+                                                                "User registration failed: Invalid email format.")
                                                                 .build(),
-                                                ErrorCode.builder().code("5000").message("Internal server error")
+                                                Code.builder().code("4104")
+                                                                .message("User registration failed: Invalid password.")
+                                                                .build(),
+                                                Code.builder().code("4105")
+                                                                .message("User registration failed: Invalid Full Name.")
+                                                                .build(),                
+                                                Code.builder().code("4106")
+                                                                .message("User registration failed: Invalid gender.")
+                                                                .build(),
+                                                Code.builder().code("4107").message(
+                                                                "User registration failed: Invalid date of birth.")
+                                                                .build(),
+                                                Code.builder().code("4108").message(
+                                                                "User registration failed: Invalid phone number.")
+                                                                .build(),
+                                                Code.builder().code("4110").message("User login failed: Empty field.")
+                                                                .build(),
+                                                Code.builder().code("4111").message(
+                                                                "User login failed: Invalid email or password.")
+                                                                .build(),
+
+                                                // ❌ Service-User Errors (4200 - 4299)
+                                                Code.builder().code("4201")
+                                                                .message("User retrieval failed: Empty field.").build(),
+
+                                                // ❌ Service-Wallet Errors (4300 - 4399)
+                                                Code.builder().code("4301")
+                                                                .message("Wallet creation failed: Empty field.")
+                                                                .build(),
+                                                Code.builder().code("4302")
+                                                                .message("Wallet update failed: Invalid request.")
+                                                                .build(),
+                                                Code.builder().code("4303")
+                                                                .message("Wallet deletion failed: Invalid request.")
+                                                                .build(),
+
+                                                // ❌ Service-Transaction Errors (4400 - 4499)
+                                                Code.builder().code("4401")
+                                                                .message("Transaction creation failed: Empty field.")
+                                                                .build(),
+                                                Code.builder().code("4402").message(
+                                                                "Transaction retrieval failed: Invalid request.")
+                                                                .build(),
+                                                Code.builder().code("4403").message(
+                                                                "Transaction deletion failed: Invalid request.")
+                                                                .build(),
+                                                Code.builder().code("4404").message(
+                                                                "Transaction processing failed: Insufficient balance.")
                                                                 .build()));
                         }
                         if (userRepository.count() == 0) {

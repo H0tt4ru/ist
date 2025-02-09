@@ -36,8 +36,6 @@ public class SecurityConfig {
                 httpSecurity
                                 .csrf(csrf -> csrf.disable())
                                 .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/admin/**").hasRole("ADMIN")
-                                                .requestMatchers("/student/**").hasRole("USER")
                                                 .anyRequest().permitAll())
                                 .exceptionHandling(exceptionHandling -> exceptionHandling
                                                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
@@ -55,9 +53,9 @@ public class SecurityConfig {
                 public void commence(HttpServletRequest request, HttpServletResponse response,
                                 AuthenticationException authenticationException) throws IOException, ServletException {
                         response.setContentType("application/json");
-                        response.setStatus(HttpStatus.OK.value());
+                        response.setStatus(HttpStatus.UNAUTHORIZED.value());
                         response.getWriter().write(
-                                        "{\"responseCode\": 4902, \"responseMessage\": \"Unauthorized request to external service\"}");
+                                        "{\"code\": 4010, \"message\": \"Unauthorized\"}");
                 }
         }
 }

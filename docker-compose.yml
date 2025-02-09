@@ -50,10 +50,17 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/ist
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+      FEIGN_URL_USER-DETAIL-SERVICE: http://service-user:8081
+      FEIGN_URL_WALLET-SERVICE: http://service-wallet:8082
     ports:
       - "8080:8080"
     networks:
       - test-networks
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   service-user:
     image: service-user:latest
@@ -61,6 +68,8 @@ services:
     restart: always
     depends_on:
       postgres:
+        condition: service_healthy
+      service-authentication:
         condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/ist
@@ -77,6 +86,8 @@ services:
     restart: always
     depends_on:
       postgres:
+        condition: service_healthy
+      service-authentication:
         condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/ist
@@ -95,6 +106,8 @@ services:
       postgres:
         condition: service_healthy
       artemis:
+        condition: service_healthy
+      service-authentication:
         condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/ist

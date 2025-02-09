@@ -52,22 +52,19 @@ public class TransactionService {
         List<Transaction> transactions = transactionRepository.findAll();
         List<TransactionResponse> filteredTransactions = transactions.stream()
                 .filter(transaction -> {
-                    if ((getRequest.getSenderEmail() == null || getRequest.getSenderEmail().isBlank())
-                            && (getRequest.getReceiverEmail() == null || getRequest.getReceiverEmail().isBlank())) {
-                        return true;
-                    } else if (getRequest.getSenderEmail() != null && !getRequest.getSenderEmail().isBlank()
-                            && (getRequest.getReceiverEmail() == null || getRequest.getReceiverEmail().isBlank())) {
-                        return userRepository.findById(transaction.getSenderId()).get().getEmail()
-                                .equals(getRequest.getSenderEmail());
-                    } else if ((getRequest.getSenderEmail() == null || getRequest.getSenderEmail().isBlank())
-                            && getRequest.getReceiverEmail() != null && !getRequest.getReceiverEmail().isBlank()) {
-                        return userRepository.findById(transaction.getReceiverId()).get().getEmail()
-                                .equals(getRequest.getReceiverEmail());
-                    } else {
+                    if (getRequest.getSenderEmail() != null && getRequest.getReceiverEmail() != null) {
                         return userRepository.findById(transaction.getSenderId()).get().getEmail()
                                 .equals(getRequest.getSenderEmail())
                                 && userRepository.findById(transaction.getReceiverId()).get().getEmail()
                                         .equals(getRequest.getReceiverEmail());
+                    } else if (getRequest.getSenderEmail() != null && getRequest.getReceiverEmail() == null) {
+                        return userRepository.findById(transaction.getSenderId()).get().getEmail()
+                                .equals(getRequest.getSenderEmail());
+                    } else if (getRequest.getReceiverEmail() != null && getRequest.getSenderEmail() == null) {
+                        return userRepository.findById(transaction.getReceiverId()).get().getEmail()
+                                .equals(getRequest.getReceiverEmail());
+                    } else {
+                        return false;
                     }
                 })
                 .map(transaction -> TransactionResponse.builder()
@@ -75,17 +72,36 @@ public class TransactionService {
                         .receiverEmail(userRepository.findById(transaction.getReceiverId()).get().getEmail())
                         .amount(transaction.getAmount())
                         .description(transaction.getDescription())
-                        .date(transaction.getDate().atZone(ZoneId.systemDefault()).toLocalDate())
-                        .time(transaction.getDate().atZone(ZoneId.systemDefault()).toLocalTime())
+                        .date(transaction.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalDate())
+                        .time(transaction.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalTime())
                         .build())
                 .collect(Collectors.toList());
-
         ListTransactionResponse listTransactionResponse = ListTransactionResponse.builder()
                 .code("2000")
                 .message("Success")
                 .transactions(filteredTransactions)
                 .build();
 
+        return ResponseEntity.ok(listTransactionResponse);
+    }
+
+    public ResponseEntity<Object> getAllTransaction() {
+        List<Transaction> transactions = transactionRepository.findAll();
+        List<TransactionResponse> transactionResponses = transactions.stream()
+                .map(transaction -> TransactionResponse.builder()
+                        .senderEmail(userRepository.findById(transaction.getSenderId()).get().getEmail())
+                        .receiverEmail(userRepository.findById(transaction.getReceiverId()).get().getEmail())
+                        .amount(transaction.getAmount())
+                        .description(transaction.getDescription())
+                        .date(transaction.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalDate())
+                        .time(transaction.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalTime())
+                        .build())
+                .collect(Collectors.toList());
+        ListTransactionResponse listTransactionResponse = ListTransactionResponse.builder()
+                .code("2000")
+                .message("Success")
+                .transactions(transactionResponses)
+                .build();
         return ResponseEntity.ok(listTransactionResponse);
     }
 
@@ -128,5 +144,26 @@ public class TransactionService {
         } else {
             return ResponseEntity.status(404).body("4000");
         }
+    }
+
+    public ResponseEntity<Object> getIncome() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Optional<User> user = userRepository.findByEmail(email);
+        GetRequest getRequest = GetRequest.builder()
+                .receiverEmail(user.get().getEmail())
+                .build();
+        System.out.println(getRequest);
+        return getTransaction(getRequest);
+    }
+
+    public ResponseEntity<Object> getOutcome() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Optional<User> user = userRepository.findByEmail(email);
+        GetRequest getRequest = GetRequest.builder()
+                .senderEmail(user.get().getEmail())
+                .build();
+        return getTransaction(getRequest);
     }
 }

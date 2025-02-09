@@ -42,5 +42,8 @@ public class Transaction {
 
     @CreationTimestamp
     @Column(updatable = false)
-    private Instant date;
+    private Instant createdAt;
+
+    @Column(nullable = true)
+    private Instant deletedAt;
 }

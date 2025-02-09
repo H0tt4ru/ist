@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.example.base_domain.dtos.UserDetailDTO;
 
-@FeignClient(name = "user-detail-service", url = "http://localhost:8081")
+@FeignClient(name = "user-detail-service", url = "${feign.url.user-detail-service}")
 public interface UserDetailClient {
 
     @PostMapping("/user-detail/create")

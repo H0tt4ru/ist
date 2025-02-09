@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.base_domain.dtos.UserDetailDTO;
-import com.example.service_user.request.TopRequest;
-import com.example.service_user.request.UserGetRequest;
-import com.example.service_user.request.UserRequest;
+import com.example.service_user.request.GetTopRequest;
+import com.example.service_user.request.GetUserRequest;
 import com.example.service_user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -35,19 +34,18 @@ public class UserController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<Object> getUser(@RequestBody UserGetRequest userRequest) throws Exception {
+    public ResponseEntity<Object> getUser(@RequestBody GetUserRequest userRequest) throws Exception {
         return userService.getUser(userRequest);
     }
 
-    // @PutMapping("/update")
-    // public ResponseEntity<Object> updateUser(@RequestBody UserDetailDTO
-    // userDetailDTO)
-    // throws Exception {
-    // return userService.updateUser(userDetailDTO);
-    // }
+    @PutMapping("/update")
+    public ResponseEntity<Object> updateUser(@RequestBody UserDetailDTO userDetailDTO)
+            throws Exception {
+        return userService.updateUser(userDetailDTO);
+    }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Object> deleteUser(@RequestBody UserGetRequest userGetRequest) throws Exception {
+    public ResponseEntity<Object> deleteUser(@RequestBody GetUserRequest userGetRequest) throws Exception {
         return userService.deleteUser(userGetRequest);
     }
 
@@ -57,8 +55,8 @@ public class UserController {
     }
 
     @PutMapping("/update-profile")
-    public ResponseEntity<Object> updateProfile(@RequestBody UserRequest userRequest) throws Exception {
-        return userService.updateProfile(userRequest);
+    public ResponseEntity<Object> updateProfile(@RequestBody UserDetailDTO userDetailDTO) throws Exception {
+        return userService.updateProfile(userDetailDTO);
     }
 
     @DeleteMapping("/delete-profile")
@@ -67,7 +65,7 @@ public class UserController {
     }
 
     @GetMapping("/get-top")
-    public ResponseEntity<Object> getTopUsers(@RequestBody TopRequest topRequest) throws Exception {
+    public ResponseEntity<Object> getTopUsers(@RequestBody GetTopRequest topRequest) throws Exception {
         return userService.getTopUsers(topRequest);
     }
 }

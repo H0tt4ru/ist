@@ -12,11 +12,7 @@ import com.example.base_domain.entities.Transaction;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 
-    Optional<Transaction> findBySenderId(UUID senderId);
+    Optional<List<Transaction>> findAllBySenderId(UUID senderId);
 
-    Optional<Transaction> findByReceiverId(UUID receiverId);
-
-    List<Transaction> findAllBySenderId(UUID senderId);
-
-    List<Transaction> findAllByReceiverId(UUID receiverId);
+    Optional<List<Transaction>> findAllByReceiverId(UUID receiverId);
 }

@@ -29,6 +29,12 @@ public class TransactionController {
         return transactionService.getTransaction(getRequest);
     }
 
+    @GetMapping("/get-all")
+    public ResponseEntity<Object> getAllTransaction()
+            throws Exception {
+        return transactionService.getAllTransaction();
+    }
+
     @DeleteMapping("/delete")
     public ResponseEntity<Object> deleteTransaction(@RequestBody UUID uid)
             throws Exception {
@@ -39,5 +45,17 @@ public class TransactionController {
     public ResponseEntity<Object> createTransaction(@RequestBody TransactionRequest transactionRequest)
             throws Exception {
         return transactionService.createTransaction(transactionRequest);
+    }
+
+    @GetMapping("/income")
+    public ResponseEntity<Object> getIncome()
+            throws Exception {
+        return transactionService.getIncome();
+    }
+
+    @GetMapping("/outcome")
+    public ResponseEntity<Object> getOutcome()
+            throws Exception {
+        return transactionService.getOutcome();
     }
 }

@@ -10,12 +10,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "error_code")
+@Table(name = "code")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ErrorCode {
+public class Code {
 
     @Id
     @Column(nullable = false)
