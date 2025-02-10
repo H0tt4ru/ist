@@ -13,6 +13,8 @@ services:
       - "5432:5432"
     networks:
       - test-networks
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U root -d ist"]
       interval: 10s
@@ -124,3 +126,6 @@ services:
 networks:
   test-networks:
     driver: bridge
+
+volumes:
+  postgres-data:

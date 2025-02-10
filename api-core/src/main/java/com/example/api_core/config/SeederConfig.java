@@ -59,9 +59,13 @@ public class SeederConfig {
                                                                 .message("User profile deleted successfully.").build(),
                                                 Code.builder().code("2301").message("Wallet created successfully.")
                                                                 .build(),
-                                                Code.builder().code("2302").message("Wallet updated successfully.")
+                                                Code.builder().code("2302").message("Wallets retrieved successfully.")
                                                                 .build(),
-                                                Code.builder().code("2303").message("Wallet deleted successfully.")
+                                                Code.builder().code("2303").message("Wallet retrieved successfully.")
+                                                                .build(),
+                                                Code.builder().code("2304").message("Wallet updated successfully.")
+                                                                .build(),
+                                                Code.builder().code("2305").message("Wallet deleted successfully.")
                                                                 .build(),
                                                 Code.builder().code("2401").message("Transaction created successfully.")
                                                                 .build(),
@@ -137,7 +141,7 @@ public class SeederConfig {
                                                                 .build(),
                                                 Code.builder().code("4105")
                                                                 .message("User registration failed: Invalid Full Name.")
-                                                                .build(),                
+                                                                .build(),
                                                 Code.builder().code("4106")
                                                                 .message("User registration failed: Invalid gender.")
                                                                 .build(),
@@ -156,6 +160,8 @@ public class SeederConfig {
                                                 // ❌ Service-User Errors (4200 - 4299)
                                                 Code.builder().code("4201")
                                                                 .message("User retrieval failed: Empty field.").build(),
+                                                Code.builder().code("4202")
+                                                                .message("User retrieval failed: Not Found.").build(),
 
                                                 // ❌ Service-Wallet Errors (4300 - 4399)
                                                 Code.builder().code("4301")

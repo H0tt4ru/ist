@@ -1,4 +1,4 @@
-package com.example.service_user.request;
+package com.example.service_user.response;
 
 import com.example.base_domain.constant.Gender;
 
@@ -11,12 +11,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UpdateUserRequest {
-
+public class UsersResponse {
     private String username;
+    private String email;
+
     private String fullName;
     private Gender gender;
     private String dob;
     private String phoneNumber;
     private String address;
+
+    private Integer balance;
 }

@@ -17,5 +17,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class ListUserResponse extends BaseResponse {
 
-    private List<UserResponse> users;
+    private List<UsersResponse> users;
 }

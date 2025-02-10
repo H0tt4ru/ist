@@ -1,4 +1,4 @@
-package com.example.service_transaction.response;
+package com.example.service_wallet.response;
 
 import java.util.List;
 
@@ -12,10 +12,10 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @SuperBuilder
-public class ListTransactionResponse extends BaseResponse {
+public class ListWalletResponse extends BaseResponse {
 
-    private List<TransactionsResponse> transactions;
+    private List<WalletsResponse> wallets;
 }
