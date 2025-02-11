@@ -50,9 +50,12 @@ pipeline {
         stage('Login to Docker Hub') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials',
-                    usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+                    withDockerRegistry([credentialsId: 'docker-hub-credentials', url: '']) {
+                        sh 'set -e'
+                        sh "docker push ${DOCKER_HUB_REPO}/service-authentication:latest"
+                        sh "docker push ${DOCKER_HUB_REPO}/service-user:latest"
+                        sh "docker push ${DOCKER_HUB_REPO}/service-wallet:latest"
+                        sh "docker push ${DOCKER_HUB_REPO}/service-transaction:latest"
                     }
                 }
             }
