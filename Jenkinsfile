@@ -54,8 +54,14 @@ pipeline {
                 script {
                     docker.withRegistry('', 'docker-hub-credentials') {
                         sh "docker push ${DOCKER_HUB_REPO}/service-authentication:latest"
+                    }
+                    docker.withRegistry('', 'docker-hub-credentials') {
                         sh "docker push ${DOCKER_HUB_REPO}/service-user:latest"
+                    }
+                    docker.withRegistry('', 'docker-hub-credentials') {
                         sh "docker push ${DOCKER_HUB_REPO}/service-wallet:latest"
+                    }
+                    docker.withRegistry('', 'docker-hub-credentials') {
                         sh "docker push ${DOCKER_HUB_REPO}/service-transaction:latest"
                     }
                 }
