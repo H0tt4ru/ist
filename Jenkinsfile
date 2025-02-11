@@ -48,6 +48,7 @@ pipeline {
             }
         }
 
+        // Test Push
         stage('Login to Docker Hub') {
             steps {
                 script {
