@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DOCKER_HUB_REPO = "h0tt4ru"
+        DOCKER_HUB_CREDENTIALS = 'docker-hub-credentials'
     }
 
     stages {
@@ -49,9 +50,14 @@ pipeline {
 
         stage('Login to Docker Hub') {
             steps {
+                sh 'docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin'
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
                 script {
-                    withDockerRegistry([credentialsId: 'docker-hub-credentials', url: '']) {
-                        sh 'set -e'
+                    docker.withRegistry('', 'docker-hub-credentials') {
                         sh "docker push ${DOCKER_HUB_REPO}/service-authentication:latest"
                         sh "docker push ${DOCKER_HUB_REPO}/service-user:latest"
                         sh "docker push ${DOCKER_HUB_REPO}/service-wallet:latest"
