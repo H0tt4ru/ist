@@ -67,16 +67,5 @@ pipeline {
                 }
             }
         }
-
-        stage('Push Docker Images') {
-            steps {
-                script {
-                    sh "docker push ${DOCKER_HUB_REPO}/service-authentication:latest"
-                    sh "docker push ${DOCKER_HUB_REPO}/service-user:latest"
-                    sh "docker push ${DOCKER_HUB_REPO}/service-wallet:latest"
-                    sh "docker push ${DOCKER_HUB_REPO}/service-transaction:latest"
-                }
-            }
-        }
     }
 }
