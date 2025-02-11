@@ -48,7 +48,7 @@ pipeline {
             }
         }
 
-        stage('Login to Docker Hub') {
+        stage('Login') {
             steps {
                 sh 'docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin'
             }
