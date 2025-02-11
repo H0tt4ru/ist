@@ -143,7 +143,7 @@ public class TransactionService {
             Wallet senderWallet = walletRepository.findById(user.get().getId()).get();
             Wallet receiverWallet = walletRepository.findById(receiver.get().getId()).get();
             if (senderWallet.getBalance() < transactionRequest.getAmount()) {
-                throw new Exception("4401");
+                throw new Exception("4404");
             }
             senderWallet.setBalance(senderWallet.getBalance() - transactionRequest.getAmount());
             receiverWallet.setBalance(receiverWallet.getBalance() + transactionRequest.getAmount());

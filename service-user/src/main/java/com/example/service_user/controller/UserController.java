@@ -24,8 +24,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/create")
-    public ResponseEntity<Object> createUser(@RequestBody UserDetailDTO userDetailDTO) throws Exception {
-        return userService.createUser(userDetailDTO);
+    public void createUser(@RequestBody UserDetailDTO userDetailDTO) throws Exception {
+        userService.createUser(userDetailDTO);
     }
 
     @GetMapping("/get-all")

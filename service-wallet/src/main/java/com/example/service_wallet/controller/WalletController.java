@@ -23,8 +23,8 @@ public class WalletController {
     private final WalletService walletService;
 
     @PostMapping("/create")
-    public ResponseEntity<Object> createWallet(@RequestBody WalletDTO walletDTO) throws Exception {
-        return walletService.createWallet(walletDTO);
+    public void createWallet(@RequestBody WalletDTO walletDTO) throws Exception {
+        walletService.createWallet(walletDTO);
     }
 
     @GetMapping("/get-all")

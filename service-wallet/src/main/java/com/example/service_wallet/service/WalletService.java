@@ -32,7 +32,7 @@ public class WalletService {
     private final CodeRepository codeRepository;
 
     @Transactional
-    public ResponseEntity<Object> createWallet(WalletDTO walletDTO) throws Exception {
+    public void createWallet(WalletDTO walletDTO) throws Exception {
         try {
             Wallet wallet = Wallet.builder()
                     .id(walletDTO.getId())
@@ -40,15 +40,6 @@ public class WalletService {
                     .build();
 
             walletRepository.save(wallet);
-
-            WalletResponse walletResponse = WalletResponse.builder()
-                    .code("2301")
-                    .message(codeRepository.findByCode("2301").get().getMessage())
-                    .email(userRepository.findById(walletDTO.getId()).get().getEmail())
-                    .balance(walletDTO.getBalance())
-                    .build();
-
-            return new ResponseEntity<>(walletResponse, HttpStatus.OK);
         } catch (Exception e) {
             throw new Exception("4000");
         }

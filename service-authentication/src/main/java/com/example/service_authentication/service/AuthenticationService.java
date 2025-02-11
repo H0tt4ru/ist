@@ -76,7 +76,7 @@ public class AuthenticationService {
                 throw new Exception("4106");
             }
 
-            if (!registerRequest.getDob().matches("^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/[0-9]{4}$")) {
+            if (!registerRequest.getDob().matches("^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$")) {
                 throw new Exception("4107");
             }
 
@@ -102,20 +102,14 @@ public class AuthenticationService {
                     .address(registerRequest.getAddress())
                     .build();
 
-            ResponseEntity<String> userDetailResponse = userDetailClient.createUserDetail(userDetailDTO);
-            if (!userDetailResponse.getStatusCode().is2xxSuccessful()) {
-                throw new Exception("4020");
-            }
+            userDetailClient.createUserDetail(userDetailDTO);
 
             WalletDTO walletDTO = WalletDTO.builder()
                     .id(savedUser.getId())
                     .balance(1000)
                     .build();
 
-            ResponseEntity<String> walletResponse = walletClient.createWallet(walletDTO);
-            if (!walletResponse.getStatusCode().is2xxSuccessful()) {
-                throw new Exception("4020");
-            }
+            walletClient.createWallet(walletDTO);
 
             RegisterResponse registerResponse = RegisterResponse.builder()
                     .code("2101")

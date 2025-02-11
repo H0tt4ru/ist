@@ -41,8 +41,9 @@ public class UserService {
     private final CodeRepository codeRepository;
 
     @Transactional
-    public ResponseEntity<Object> createUser(UserDetailDTO userDetailDTO) throws Exception {
+    public void createUser(UserDetailDTO userDetailDTO) throws Exception {
         try {
+            System.out.println(userDetailDTO);
             Optional<UserDetail> userDetailOptional = userDetailRepository
                     .findByPhoneNumber(userDetailDTO.getPhoneNumber());
             if (userDetailOptional.isPresent()) {
@@ -59,20 +60,6 @@ public class UserService {
                     .build();
 
             userDetailRepository.save(userDetail);
-
-            UserResponse userResponse = UserResponse.builder()
-                    .code("2201")
-                    .message(codeRepository.findByCode("2201").get().getMessage())
-                    .username(userRepository.findById(userDetailDTO.getId()).get().getUser())
-                    .email(userRepository.findById(userDetailDTO.getId()).get().getEmail())
-                    .fullName(userDetail.getFullName())
-                    .gender(userDetail.getGender())
-                    .dob(userDetail.getDob().toString())
-                    .phoneNumber(userDetail.getPhoneNumber())
-                    .address(userDetail.getAddress())
-                    .build();
-
-            return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }

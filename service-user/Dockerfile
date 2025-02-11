@@ -1,32 +1,42 @@
-FROM eclipse-temurin:23-jdk-alpine
+FROM maven:3.9.9-eclipse-temurin-21-jammy AS builder
 
-RUN apk add --no-cache maven
+WORKDIR /app
 
-ENV MAVEN_OPTS="-Dmaven.repo.local=/root/.m2/repository"
-
-COPY pom.xml /app/bom/pom.xml
+# Copy BOM first (since it has no source code, only POM)
+COPY pom.xml bom/pom.xml
 WORKDIR /app/bom
 RUN mvn clean install -DskipTests && rm -rf /app/bom
 
+# Copy Base-Domain (has source code)
 COPY base-domain /app/base-domain
 WORKDIR /app/base-domain
 RUN mvn clean install -DskipTests && rm -rf /app/base-domain
 
+# Copy Shared-Utils (has source code)
 COPY shared-utils /app/shared-utils
 WORKDIR /app/shared-utils
 RUN mvn clean install -DskipTests && rm -rf /app/shared-utils
 
+# Copy API-Core (has source code)
 COPY api-core /app/api-core
 WORKDIR /app/api-core
 RUN mvn clean install -DskipTests && rm -rf /app/api-core
 
+# ---- Stage 2: Build Service ----
+WORKDIR /app/service-user
+COPY service-user /app/service-user
+RUN mvn clean package -DskipTests
+
+# ---- Stage 3: Runtime ----
+FROM openjdk:21-jdk-slim
+
 WORKDIR /app
 
-COPY service-user/.mvn .mvn
-COPY service-user/mvnw mvnw
-COPY service-user/pom.xml pom.xml
-COPY service-user/src /app/src
+# Copy only the built JAR from the builder stage
+COPY --from=builder /app/service-user/target/*.jar app.jar
 
-RUN mvn clean package install -DskipTests
+# Expose port 8080 for the service
+EXPOSE 8081
 
-CMD ["mvn", "spring-boot:run"]
+# Start the application
+CMD ["java", "-jar", "app.jar"]

@@ -1,5 +1,4 @@
-version: "3.8"
-
+version: "3"
 services:
   postgres:
     image: postgres:latest
@@ -48,6 +47,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      artemis:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/ist
       SPRING_DATASOURCE_USERNAME: root
@@ -58,11 +59,6 @@ services:
       - "8080:8080"
     networks:
       - test-networks
-    healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "8080"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   service-user:
     image: service-user:latest
@@ -70,8 +66,6 @@ services:
     restart: always
     depends_on:
       postgres:
-        condition: service_healthy
-      service-authentication:
         condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/ist
@@ -88,8 +82,6 @@ services:
     restart: always
     depends_on:
       postgres:
-        condition: service_healthy
-      service-authentication:
         condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/ist
@@ -109,13 +101,11 @@ services:
         condition: service_healthy
       artemis:
         condition: service_healthy
-      service-authentication:
-        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/ist
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-      SPRING_ARTEMIS_BROKER-URL: tcp://artemis:61616
+      SPRING_ARTEMIS_BROKER_URL: tcp://artemis:61616
       SPRING_ARTEMIS_USERNAME: artemis
       SPRING_ARTEMIS_PASSWORD: admin
     ports:
@@ -126,6 +116,5 @@ services:
 networks:
   test-networks:
     driver: bridge
-
 volumes:
   postgres-data:

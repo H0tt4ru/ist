@@ -1,43 +1,69 @@
 pipeline {
     agent any
-    
+
+    environment {
+        DOCKER_HUB_REPO = "h0tt4ru"
+    }
+
     stages {
-        stage('Pull Repository') {
+        stage('Pull Latest Code') {
             steps {
                 script {
-                    sh 'git pull origin main'
+                    sh 'git pull origin main'  // Adjust branch if needed
                 }
             }
         }
 
-        stage('Maven Build') {
+        stage('Build Maven Projects') {
             steps {
                 script {
-                    sh 'mvn clean install'
-                }
-            }
-        }
-
-        stage('Build Dependencies') {
-            steps {
-                script {
+                    sh 'mvn clean install'           // Build root project
                     sh 'cd base-domain && mvn clean install'
-                    sh 'cd ../shared-utils && mvn clean install'
-                    sh 'cd ../api-core && mvn clean install'
+                    sh 'cd api-core && mvn clean install'
+                    sh 'cd shared-utils && mvn clean install'
                 }
             }
         }
 
-        stage('Docker Build Services') {
+        stage('Build Docker Images') {
             steps {
                 script {
-                    sh '''
-                        cd .. # Ensure we're in the root repo folder
-                        sudo docker build -t service-authentication:latest -f service-authentication/Dockerfile .
-                        sudo docker build -t service-user:latest -f service-user/Dockerfile .
-                        sudo docker build -t service-wallet:latest -f service-wallet/Dockerfile .
-                        sudo docker build -t service-transaction:latest -f service-transaction/Dockerfile .
-                    '''
+                    sh 'docker build -t service-authentication:latest -f service-authentication/Dockerfile .'
+                    sh 'docker build -t service-user:latest -f service-user/Dockerfile .'
+                    sh 'docker build -t service-wallet:latest -f service-wallet/Dockerfile .'
+                    sh 'docker build -t service-transaction:latest -f service-transaction/Dockerfile .'
+                }
+            }
+        }
+
+        stage('Tag Docker Images') {
+            steps {
+                script {
+                    sh "docker tag service-authentication:latest ${DOCKER_HUB_REPO}/service-authentication:latest"
+                    sh "docker tag service-user:latest ${DOCKER_HUB_REPO}/service-user:latest"
+                    sh "docker tag service-wallet:latest ${DOCKER_HUB_REPO}/service-wallet:latest"
+                    sh "docker tag service-transaction:latest ${DOCKER_HUB_REPO}/service-transaction:latest"
+                }
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'h0tt4ru', passwordVariable: 'Kenzieanielostenlie')]) {
+                        sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Images') {
+            steps {
+                script {
+                    sh "docker push ${DOCKER_HUB_REPO}/service-authentication:latest"
+                    sh "docker push ${DOCKER_HUB_REPO}/service-user:latest"
+                    sh "docker push ${DOCKER_HUB_REPO}/service-wallet:latest"
+                    sh "docker push ${DOCKER_HUB_REPO}/service-transaction:latest"
                 }
             }
         }

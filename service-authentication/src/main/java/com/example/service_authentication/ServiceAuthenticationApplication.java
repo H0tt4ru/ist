@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@EnableFeignClients
+@EnableFeignClients(basePackages = "com.example.service_authentication.client")
 @SpringBootApplication
 @ComponentScan(basePackages = "com.example")
 @EntityScan(basePackages = "com.example.base_domain.entities")

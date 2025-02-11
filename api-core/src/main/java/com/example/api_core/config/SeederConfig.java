@@ -31,7 +31,7 @@ public class SeederConfig {
                         TransactionRepository transactionRepository, CodeRepository codeRepository,
                         WalletRepository walletRepository,
                         PasswordEncoder passwordEncoder) {
-                return _ -> {
+                return x -> {
                         if (codeRepository.count() == 0) {
                                 codeRepository.saveAll(List.of(
                                                 // ✅ Success Codes (2000 - 2999)
